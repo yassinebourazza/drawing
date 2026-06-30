@@ -99,3 +99,29 @@ impl Drawable for Circle {
         Color::hex("#15ff44").unwrap()
     }
 }
+
+
+
+//Rectangle
+pub struct Rectangle {
+     first_point: Point, 
+     second_point: Point, 
+} 
+
+
+impl Drawable for Rectangle { 
+    pub fn new(fpoint : Point , spoint : Point) -> self { 
+        let left = fpoint.0.min(spoint.0); 
+        let right = fpoint.0.max(spoint.0); 
+        let top = fpoint.1.min(spoint.1); 
+        let bottom = fpoint.1.max(spoint.1); 
+        
+        Self { 
+            first_point: Point(left, top), 
+            second_point: Point(right, bottom), 
+        } 
+    } 
+    pub fn draw() {
+        //
+    } 
+}
