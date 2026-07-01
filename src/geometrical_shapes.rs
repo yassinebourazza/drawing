@@ -36,7 +36,7 @@ impl Drawable for Point {
         img.display(self.x, self.y, self.color());
     }
     fn color(&self) -> Color {
-        Color::hex("#F5F5F5").unwrap()
+        Color::rgb(255, 255, 255)
     }
 }
 
@@ -75,15 +75,17 @@ impl Drawable for Circle {
         let mut x = 0;
         let mut y = r;
 
+        let color = self.color();
+
         while x <= y {
-            img.display(cx + x, cy + y, self.color());
-            img.display(cx - x, cy + y, self.color());
-            img.display(cx + x, cy - y, self.color());
-            img.display(cx - x, cy - y, self.color());
-            img.display(cx + y, cy + x, self.color());
-            img.display(cx - y, cy + x, self.color());
-            img.display(cx + y, cy - x, self.color());
-            img.display(cx - y, cy - x, self.color());
+            img.display(cx + x, cy + y, color.clone());
+            img.display(cx - x, cy + y, color.clone());
+            img.display(cx + x, cy - y, color.clone());
+            img.display(cx - x, cy - y, color.clone());
+            img.display(cx + y, cy + x, color.clone());
+            img.display(cx - y, cy + x, color.clone());
+            img.display(cx + y, cy - x, color.clone());
+            img.display(cx - y, cy - x, color.clone());
 
             
             x += 1;
@@ -93,7 +95,11 @@ impl Drawable for Circle {
         } 
     }
     fn color(&self) -> Color {
-        Color::hex("#E8896A").unwrap()
+        let mut rng = rand::thread_rng();
+        let r = rng.gen_range(0..254);
+        let g = rng.gen_range(0..254);
+        let b = rng.gen_range(0..254);
+        Color::rgb(r, g, b)
     }
 }
 
@@ -129,7 +135,7 @@ impl Drawable for Line {
     }
         
     fn color(&self) -> Color {
-     Color::hex("#5B9BD5").unwrap()
+     Color::rgb(14, 227, 255)
     }
 
 }
@@ -192,7 +198,7 @@ impl Drawable for Triangle {
     }
 
     fn color(&self) -> Color {
-        Color::hex("#9B59B6").unwrap()
+        Color::rgb(255, 33, 226)
     }
 }
 
@@ -243,10 +249,11 @@ impl Drawable for Rectangle {
     } 
 
     fn color(&self) -> Color {
-        Color::hex("#7DAF7D").unwrap()
+        Color::rgb(255, 245, 12)
     }
 }
 
+// unit test
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -273,27 +280,27 @@ mod tests {
 
     #[test]
     fn test_circle_properties() {
-    // random
-    let img_w = 800;
-    let img_h = 600;
+        // random
+        let img_w = 800;
+        let img_h = 600;
 
-    for _ in 0..1000 {
-        let circle = Circle::random(img_w, img_h);
+        for _ in 0..1000 {
+            let circle = Circle::random(img_w, img_h);
 
-        assert!(circle.center.x >= 0 && circle.center.x < img_w, "out of bound");
-        assert!(circle.center.y >= 0 && circle.center.y < img_h, "out of bound");
+            assert!(circle.center.x >= 0 && circle.center.x < img_w, "out of bound");
+            assert!(circle.center.y >= 0 && circle.center.y < img_h, "out of bound");
+        }
+
+        // rayon = 0
+        let center = Point::new(15, 15);
+        let cz = Circle::new(&center, 0);
+
+        assert!(cz.radius == 0);
+        assert!(cz.center == center);
+
+        let mut img = Image::blank(100, 100);
+        cz.draw(&mut img);
     }
-
-    // rayon = 0
-    let center = Point::new(15, 15);
-    let cz = Circle::new(&center, 0);
-
-    assert!(cz.radius == 0);
-    assert!(cz.center == center);
-
-    let mut img = Image::blank(100, 100);
-    cz.draw(&mut img);
-}
 
 
     #[test]
@@ -333,16 +340,16 @@ mod tests {
     }
 
     #[test]
-    fn rectangle_same_point() {
+    fn rectangle_point_outside() {
         let p = Point::new(100, 100);
         let p2 = Point::new(1200, 1100);
 
-        let rect = Rectangle::new(&p, &p);
+        let rect = Rectangle::new(&p, &p2);
 
         assert_eq!(rect.first_point.x, 100);
         assert_eq!(rect.first_point.y, 100);
-        assert_eq!(rect.second_point.x, 100);
-        assert_eq!(rect.second_point.y, 100);
+        assert_eq!(rect.second_point.x, 1200);
+        assert_eq!(rect.second_point.y, 1100);
     }
 
 }
