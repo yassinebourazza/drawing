@@ -295,6 +295,14 @@ mod tests {
     cz.draw(&mut img);
 }
 
+
+    #[test]
+    fn line_same_points() {
+        let p = Point::new(10, 10);
+        let _l = Line::new(&p, &p);
+    }
+
+
     #[test]
     fn test_rectangle_reversed_points() {
         let p1 = Point::new(150, 300);
@@ -313,9 +321,30 @@ mod tests {
     }
 
     #[test]
-    fn line_same_points() {
-        let p = Point::new(10, 10);
-        let _l = Line::new(&p, &p);
+    fn rectangle_same_point() {
+        let p = Point::new(100, 100);
+
+        let rect = Rectangle::new(&p, &p);
+
+        assert_eq!(rect.first_point.x, 100);
+        assert_eq!(rect.first_point.y, 100);
+        assert_eq!(rect.second_point.x, 100);
+        assert_eq!(rect.second_point.y, 100);
+    }
+
+    #[test]
+    fn rectangle_same_point() {
+        let p = Point::new(100, 100);
+        let p2 = Point::new(1200, 1100);
+
+        let rect = Rectangle::new(&p, &p);
+
+        assert_eq!(rect.first_point.x, 100);
+        assert_eq!(rect.first_point.y, 100);
+        assert_eq!(rect.second_point.x, 100);
+        assert_eq!(rect.second_point.y, 100);
     }
 
 }
+
+
