@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use raster::{Color, Image};
 use rand::prelude::*;
 
@@ -35,11 +36,12 @@ impl Drawable for Point {
         img.display(self.x, self.y, self.color());
     }
     fn color(&self) -> Color {
-        Color::hex("#FFFFFF").unwrap()
+        Color::hex("#F5F5F5").unwrap()
     }
 }
 
 // circle
+#[derive(PartialEq)]
 pub struct Circle { 
     center: Point, 
     radius: i32 
@@ -73,8 +75,6 @@ impl Drawable for Circle {
         let mut x = 0;
         let mut y = r;
 
-        let mut er = (x * x) + (r * r) - (r * r); // x² + y² - r²
-
         while x <= y {
             img.display(cx + x, cy + y, self.color());
             img.display(cx - x, cy + y, self.color());
@@ -87,16 +87,13 @@ impl Drawable for Circle {
 
             
             x += 1;
-            er += 2*x - 1;
-
-            if er > 0 {
+            if (x * x) + (y * y) - (r * r) > 0 { // x² + y² - r²
                 y -= 1;
-                er -= 2*y + 1;
             }
         } 
     }
     fn color(&self) -> Color {
-        Color::hex("#15ff44").unwrap()
+        Color::hex("#E8896A").unwrap()
     }
 }
 
@@ -134,7 +131,7 @@ impl Drawable for Line {
     }
         
     fn color(&self) -> Color {
-     Color::white()
+     Color::hex("#5B9BD5").unwrap()
     }
 
 }
@@ -197,7 +194,7 @@ impl Drawable for Triangle {
     }
 
     fn color(&self) -> Color {
-        Color::blue()
+        Color::hex("#9B59B6").unwrap()
     }
 }
 
@@ -248,6 +245,32 @@ impl Drawable for Rectangle {
     } 
 
     fn color(&self) -> Color {
-        Color::hex("#ffffff").unwrap()
+        Color::hex("#7DAF7D").unwrap()
     }
+}
+
+
+// unit test ( circle )
+#[test]
+fn test_circle_properties() {
+    // random
+    let img_w = 800;
+    let img_h = 600;
+
+    for _ in 0..1000 {
+        let circle = Circle::random(img_w, img_h);
+
+        assert!(circle.center.x >= 0 && circle.center.x < img_w, "out of bound");
+        assert!(circle.center.y >= 0 && circle.center.y < img_h, "out of bound");
+    }
+
+    // rayon = 0
+    let center = Point::new(15, 15);
+    let cz = Circle::new(&center, 0);
+
+    assert!(cz.radius == 0);
+    assert!(cz.center == center);
+
+    let mut img = Image::blank(100, 100);
+    cz.draw(&mut img);
 }
