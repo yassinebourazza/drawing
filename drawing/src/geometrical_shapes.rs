@@ -11,7 +11,7 @@ pub trait Displayable {
 }
 
 // point
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Point { 
     x: i32, 
     y: i32, 
@@ -100,9 +100,108 @@ impl Drawable for Circle {
     }
 }
 
+//Line
+pub struct Line {
+    start : Point,
+    end : Point,
+}
 
+impl Line {
+    pub fn new(start : &Point, end : &Point) -> Self {
+        assert!(start != end , "start and end must be differents");
 
-//Rectangle
+        Self{
+            start : start.clone(),
+            end : end.clone(),
+        }
+    }
+
+    pub fn random(width: i32, height: i32) -> Self {
+        loop {
+            let start = Point::random(width, height);
+            let end = Point::random(width, height);
+            if start != end {
+                return Self { start, end };
+            }
+        }
+    }
+
+}
+
+impl Drawable for Line {
+    fn draw(&self, image : &mut Image) {
+        draw_line(&self.start, &self.end, image, &self.color())
+    }
+        
+    fn color(&self) -> Color {
+     Color::white()
+    }
+
+}
+
+fn draw_line(start: &Point, end: &Point, image: &mut Image, color: &Color) {
+    let dx = (end.x - start.x).abs() as f32;
+    let dy = (end.y - start.y).abs() as f32;
+
+    let sx: f32 = if start.x < end.x { 1.0 } else { -1.0 };
+    let sy: f32 = if start.y < end.y { 1.0 } else { -1.0 };
+
+    let mut x = start.x as f32;
+    let mut y = start.y as f32;
+
+    if dy <= dx {
+        let steps = dy/dx;
+
+        for _ in 0..=dx as i32 {
+            image.display(x as i32, y.round() as i32, color.clone());
+
+            x += sx;
+            y += sy * steps;
+        }
+
+    } else {
+        let steps = dx/dy;
+
+        for _ in 0..=dy as i32{
+            image.display(x.round() as i32, y as i32, color.clone());
+            y += sy;
+            x += sx * steps;
+        }
+    }
+}
+
+//triangle 
+pub struct Triangle {
+    p1 : Point,
+    p2 : Point,
+    p3 : Point,
+}
+
+impl Triangle {
+    pub fn new(p1 : &Point, p2 : &Point , p3 : &Point) -> Self {
+        Self {
+            p1 : p1.clone(),
+            p2 : p2.clone(),
+            p3 : p3.clone(),
+        }
+    }
+}
+
+impl Drawable for Triangle {
+    fn draw(&self, image: &mut Image) {
+        let color = self.color();
+        
+        draw_line(&self.p1, &self.p2, image, &color);
+        draw_line(&self.p2, &self.p3, image, &color);
+        draw_line(&self.p3, &self.p1, image, &color);
+    }
+
+    fn color(&self) -> Color {
+        Color::blue()
+    }
+}
+
+Rectangle
 pub struct Rectangle {
      first_point: Point, 
      second_point: Point, 
