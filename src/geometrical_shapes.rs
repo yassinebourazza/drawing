@@ -105,8 +105,6 @@ pub struct Line {
 
 impl Line {
     pub fn new(start : &Point, end : &Point) -> Self {
-        assert!(start != end , "start and end must be differents");
-
         Self{
             start : start.clone(),
             end : end.clone(),
@@ -202,8 +200,8 @@ impl Drawable for Triangle {
 
 //Rectangle
 pub struct Rectangle {
-     first_point: Point, 
-     second_point: Point, 
+    first_point: Point, 
+    second_point: Point, 
 } 
 
 impl Rectangle {
@@ -249,10 +247,32 @@ impl Drawable for Rectangle {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-// unit test ( circle )
-#[test]
-fn test_circle_properties() {
+    #[test]
+    fn point_random_within_bounds() {
+        for _ in 0..1000 {
+            let p = Point::random(500, 500);
+            assert!(p.x >= 0 && p.x < 500, "x out of bounds: {}", p.x);
+            assert!(p.y >= 0 && p.y < 500, "y out of bounds: {}", p.y);
+        }
+    }
+
+    #[test]
+    fn line_random_within_bounds() {
+        for _ in 0..1000 {
+            let l = Line::random(500, 500);
+            assert!(l.start.x >= 0 && l.start.x < 500, "start.x out of bounds: {}", l.start.x);
+            assert!(l.start.y >= 0 && l.start.y < 500, "start.y out of bounds: {}", l.start.y);
+            assert!(l.end.x >= 0 && l.end.x < 500, "end.x out of bounds: {}", l.end.x);
+            assert!(l.end.y >= 0 && l.end.y < 500, "end.y out of bounds: {}", l.end.y);
+        }
+    }
+
+    #[test]
+    fn test_circle_properties() {
     // random
     let img_w = 800;
     let img_h = 600;
@@ -273,4 +293,29 @@ fn test_circle_properties() {
 
     let mut img = Image::blank(100, 100);
     cz.draw(&mut img);
+}
+
+    #[test]
+    fn test_rectangle_reversed_points() {
+        let p1 = Point::new(150, 300);
+        let p2 = Point::new(50, 60);
+        let r = Rectangle::new(&p1, &p2);
+
+        let x1 = r.first_point.x.min(r.second_point.x);
+        let y1 = r.first_point.y.min(r.second_point.y);
+        let x2 = r.first_point.x.max(r.second_point.x);
+        let y2 = r.first_point.y.max(r.second_point.y);
+
+        assert!(x1 == 50, "x1 should be 50, got: {}", x1);
+        assert!(y1 == 60, "y1 should be 60, got: {}", y1);
+        assert!(x2 == 150, "x2 should be 150, got: {}", x2);
+        assert!(y2 == 300, "y2 should be 300, got: {}", y2);
+    }
+
+    #[test]
+    fn line_same_points() {
+        let p = Point::new(10, 10);
+        let _l = Line::new(&p, &p);
+    }
+
 }
