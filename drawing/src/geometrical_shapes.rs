@@ -10,7 +10,7 @@ pub trait Drawable {
     fn color(&self) -> Color;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Point {
     pub x : i32,
     pub y : i32,    
@@ -59,16 +59,21 @@ impl Drawable for Line {
 
 impl Line {
     pub fn new(start : &Point, end : &Point) -> Self {
+        assert!(start != end , "start and end must be differents");
+
         Self{
             start : start.clone(),
             end : end.clone(),
         }
     }
 
-    pub fn random(width : i32, height : i32) -> Self {
-        Self {
-            start : Point::random(width, height),
-            end : Point::random(width, height),            
+    pub fn random(width: i32, height: i32) -> Self {
+        loop {
+            let start = Point::random(width, height);
+            let end = Point::random(width, height);
+            if start != end {
+                return Self { start, end };
+            }
         }
     }
 
@@ -105,35 +110,33 @@ impl Triangle {
 }
 
 
-fn draw_line(start : &Point, end :&Point, image: &mut Image, color: &Color) {
-    let dx = (end.x - start.x).abs();
-    let dy = (end.y - start.y).abs();
+fn draw_line(start: &Point, end: &Point, image: &mut Image, color: &Color) {
+    let dx = (end.x - start.x).abs() as f32;
+    let dy = (end.y - start.y).abs() as f32;
 
-    let sx = if start.x < end.x { 1 } else { -1 };
-    let sy = if start.y < end.y { 1 } else { -1 };
+    let sx: f32 = if start.x < end.x { 1.0 } else { -1.0 };
+    let sy: f32 = if start.y < end.y { 1.0 } else { -1.0 };
 
-    let mut x = start.x;
-    let mut y = start.y;
+    let mut x = start.x as f32;
+    let mut y = start.y as f32;
 
-    let mut err = dx - dy;
+    if dy <= dx {
+        let steps = dy/dx;
 
-    loop {
-        image.display(x, y, color.clone());
+        for _ in 0..=dx as i32 {
+            image.display(x as i32, y.round() as i32, color.clone());
 
-        if x == end.x && y == end.y {
-            break;
-        }
-
-        let e2 = 2 * err;
-
-        if e2 > -dy {
-            err -= dy;
             x += sx;
+            y += sy * steps;
         }
 
-        if e2 < dx {
-            err += dx;
+    } else {
+        let steps = dx/dy;
+
+        for _ in 0..=dy as i32{
+            image.display(x.round() as i32, y as i32, color.clone());
             y += sy;
+            x += sx * steps;
         }
     }
 }
