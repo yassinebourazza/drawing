@@ -201,26 +201,53 @@ impl Drawable for Triangle {
     }
 }
 
-Rectangle
+
+
+//Rectangle
 pub struct Rectangle {
      first_point: Point, 
      second_point: Point, 
 } 
 
+impl Rectangle {
 
-impl Drawable for Rectangle { 
-    pub fn new(fpoint : Point , spoint : Point) -> self { 
-        let left = fpoint.0.min(spoint.0); 
-        let right = fpoint.0.max(spoint.0); 
-        let top = fpoint.1.min(spoint.1); 
-        let bottom = fpoint.1.max(spoint.1); 
+     pub fn new(fpoint : &Point , spoint : &Point) -> Self { 
+        let x1 = fpoint.x.min(spoint.x); 
+        let x2 = fpoint.x.max(spoint.x); 
+        let y1 = fpoint.y.min(spoint.y); 
+        let y2 = fpoint.y.max(spoint.y); 
         
         Self { 
-            first_point: Point(left, top), 
-            second_point: Point(right, bottom), 
+            first_point: Point{x : x1, y : y1}, 
+            second_point: Point{x : x2, y : y2}, 
         } 
     } 
-    pub fn draw() {
-        //
+
+}
+
+impl Drawable for Rectangle { 
+   
+    fn draw(&self , image : &mut Image) {
+        let x1 = self.first_point.x;
+        let x2 = self.second_point.x;
+        let y1 = self.first_point.y;
+        let y2 = self.second_point.y;
+
+
+        for x in x1..=x2 {
+            image.display(x, y1, self.color());
+            image.display(x, y2, self.color());
+        }
+
+
+        for y in y1..=y2 {
+            image.display(x1, y, self.color());
+            image.display(x2, y, self.color());
+        }
+
     } 
+
+    fn color(&self) -> Color {
+        Color::hex("#ffffff").unwrap()
+    }
 }
